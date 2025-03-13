@@ -1,0 +1,33 @@
+classdef orginal_grayimage < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure  matlab.ui.Figure
+        Button    matlab.ui.control.Button
+        UIAxes2   matlab.ui.control.UIAxes
+        UIAxes    matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button
+        function ButtonPushed(app, event)
+            [filename,pathname]=uigetfile({"*.jpg,*.bmp,*.pnp";"*.*"},"选择图像");
+            if isequal(filename,0)||isequal(pathname,0)%逻辑运算符，与
+                errordlg("没有选中文件","错误");
+            else
+                %记录获取文件的名字和路径
+                %局部变量还是变局变量
+                file=strcat(pathname,filename);
+            end
+
+            %原图
+           im=imread(file);
+           imshow(im,"Parent",app.UIAxes);
+           msgbox("读取成功","提示");
+           %灰度图
+           gray_image=rgb2gray(im)
+           imshow(gray_image,"Parent",app.UIAxes2)
+        end
+    end
