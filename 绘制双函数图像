@@ -1,0 +1,22 @@
+classdef app3 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure  matlab.ui.Figure
+        Button    matlab.ui.control.Button
+        UIAxes2   matlab.ui.control.UIAxes
+        UIAxes    matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button
+        function ButtonPushed(app, event)
+            %生成x
+            x=1:0.01:10; %其中0.01为步长、
+            y=sin(x);
+            y1=cos(x);
+            plot(app.UIAxes,x,y,"r");
+            hold(app.UIAxes,"on");
+            plot(app.UIAxes,x,y1,'g')
