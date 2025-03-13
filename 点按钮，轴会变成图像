@@ -1,0 +1,20 @@
+classdef axis_image < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure         matlab.ui.Figure
+        bildlesenButton  matlab.ui.control.Button
+        UIAxes           matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: bildlesenButton
+        function bildlesenButtonPushed(app, event)
+            %read the picture
+        file="C:\Users\jiaxue\Videos\6fd7cb900hd1f1c0fb398921cf99d5c6\6fd7cb900hd1f1c0fb398921cf99d5c6.JPG";
+        %在matlab总im开头的系统函数都和图像处理有关 image
+        im=imread(file);
+        imshow(im,'Parent',app.UIAxes);
+        axis(app.UIAxes,"off");
