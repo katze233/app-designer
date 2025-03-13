@@ -1,0 +1,79 @@
+classdef button_hello < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure   matlab.ui.Figure
+        TextArea   matlab.ui.control.TextArea
+        EditField  matlab.ui.control.EditField
+        Button     matlab.ui.control.Button
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button
+        function ButtonPushed(app, event)
+            app.EditField.Value="hello"; %点按钮，他在文本框里说hello
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 525 524];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create Button
+            app.Button = uibutton(app.UIFigure, 'push');
+            app.Button.ButtonPushedFcn = createCallbackFcn(app, @ButtonPushed, true);
+            app.Button.BackgroundColor = [0.0745 0.6235 1];
+            app.Button.FontColor = [1 1 1];
+            app.Button.Position = [194 176 142 39];
+
+            % Create EditField
+            app.EditField = uieditfield(app.UIFigure, 'text');
+            app.EditField.Position = [207 282 115 40];
+
+            % Create TextArea
+            app.TextArea = uitextarea(app.UIFigure);
+            app.TextArea.HorizontalAlignment = 'center';
+            app.TextArea.FontSize = 36;
+            app.TextArea.BackgroundColor = [0.902 0.902 0.902];
+            app.TextArea.Position = [1 415 525 109];
+            app.TextArea.Value = {'第一次测试'};
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = button_hello
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
