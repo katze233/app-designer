@@ -18,106 +18,18 @@ if us < threshold
     count = count - 1;
     continue;
 
-function readAndPlotData(app)
-    persistent lastHeatmapUpdateTime
-    if isempty(lastHeatmapUpdateTime)
-        lastHeatmapUpdateTime = tic;
-    end
+ersistent lastXYTime lastHeatmapTime
+if isempty(lastXYTime), lastXYTime = tic; end
+if isempty(lastHeatmapTime), lastHeatmapTime = tic; end
 
-    try
-        writeline(app.Interface, "DATA:POINTS?");
-        pause(0.3);
+% 光斑图每 0.1 秒更新一次
+if toc(lastXYTime) > 0.1
+    updateXYSpot(app, x, y);  % 更新光斑位置
+    lastXYTime = tic;
+end
 
-        count = 0;
-        if app.Interface.NumBytesAvailable > 0
-            countStr = readline(app.Interface);
-            count = str2double(strtrim(countStr));
-        end
-
-        if count > 0
-            writeline(app.Interface, "DATA:REMOVE? " + num2str(count));
-            pause(0.3);
-
-            while count > 0 && app.Interface.NumBytesAvailable > 0
-                line1 = strtrim(readline(app.Interface));
-
-                if isempty(line1) || ~contains(line1, ',')
-                    disp(" line1 is invalid, skipping：" + line1);
-                    count = count - 1;
-                    continue;
-                end
-
-                fid = fopen('D:\GONG\data\laser_data.txt', 'a');
-                fprintf(fid, '%s\n', line1);
-                fclose(fid);
-
-                parts = split(line1, ',');
-
-                if numel(parts) >= 12
-                    ux = str2double(parts(10));
-                    uy = str2double(parts(11));
-                    us = str2double(parts(12));
-
-                    threshold = app.UsThresholdSlider.Value;
-                    fprintf("us = %.5f, threshold = %.3f\n", us, threshold);
-
-                    if us < threshold
-                        if isprop(app, 'LaserStatusLabel') && isvalid(app.LaserStatusLabel)
-                            app.LaserStatusLabel.Text = "Status：no laser";
-                        end
-
-                        app.Data(end+1, :) = table(NaN, NaN, us, ...
-                            'VariableNames', {'uxVoltage', 'uyVoltage', 'usVoltage'});
-
-                        if height(app.Data) > 300
-                            app.Data = tail(app.Data, 300);
-                        end
-
-                        % 限制热力图更新频率为 0.5 秒
-                        if toc(lastHeatmapUpdateTime) > 0.5
-                            app.updateSpotOffset();
-                            lastHeatmapUpdateTime = tic;
-                        end
-
-                        count = count - 1;
-                        continue;
-                    else
-                        if isprop(app, 'LaserStatusLabel') && isvalid(app.LaserStatusLabel)
-                            app.LaserStatusLabel.Text = "Status: collecting laser information";
-                        end
-                    end
-
-                    if all(~isnan([ux, uy, us]))
-                        app.SampleIndex = app.SampleIndex + 1;
-                        app.Data(end+1, :) = table(ux, uy, us, ...
-                            'VariableNames', {'uxVoltage', 'uyVoltage', 'usVoltage'});
-
-                        if height(app.Data) > 300
-                            app.Data = tail(app.Data, 300);
-                        end
-
-                        app.updateScatterPlot(ux, uy, us);
-
-                        % 限制热力图更新频率为 0.5 秒
-                        if toc(lastHeatmapUpdateTime) > 0.5
-                            app.updateSpotOffset();
-                            lastHeatmapUpdateTime = tic;
-                        end
-
-                        drawnow limitrate;
-                    end
-                end
-
-                count = count - 1;
-            end
-
-            % 调试信息记录
-            line2 = writeread(app.Interface, "SYSTem:DEBUg:MEMory?");
-            writelines(line2, 'memory_data.txt', WriteMode="append", LineEnding=" ");
-            disp("write memory data into：" + app.MemoryDataFile);
-        end
-
-    catch ME
-        disp(" readAndPlotData wrong：" + ME.message);
-    end
+% 热力图每 0.5 秒更新一次
+if toc(lastHeatmapTime) > 0.5
+    updateHeatmap(app);       % 更新热力图
+    lastHeatmapTime = tic;
 end
