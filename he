@@ -18,7 +18,7 @@ if us < threshold
     count = count - 1;
     continue;
 
-ersistent lastXYTime lastHeatmapTime
+persistent lastXYTime lastHeatmapTime
 if isempty(lastXYTime), lastXYTime = tic; end
 if isempty(lastHeatmapTime), lastHeatmapTime = tic; end
 
